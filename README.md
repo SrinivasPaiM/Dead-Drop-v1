@@ -75,13 +75,14 @@ Below is a demonstration of sending a message from a phone (using Termux) to a l
 
 ### 1. **Message Sent from Phone (Termux)**
 
-![Sending message from Termux on Android phone](![mobile_msg](https://github.com/user-attachments/assets/470380f2-d900-42d0-853c-ea84457841f0)
-)
+![mobile_msg](https://github.com/user-attachments/assets/bc141161-a012-43d0-8223-c1a34a3e6e7a)
+
+
 
 ### 2. **Message Received on Laptop**
 
-![Message auto-fetched and displayed on laptop](![mobile_msg](https://github.com/user-attachments/assets/78226204-861f-4b7d-99df-5429648cfece)
-)
+![mobile_msg](https://github.com/user-attachments/assets/06bbbb08-4d7e-44b6-9e84-830b04f7f991)
+
 
 - The phone uses [Termux](https://termux.com/) to run the Python script and send the message.
 - The laptop runs the receiver and automatically displays the incoming message.
