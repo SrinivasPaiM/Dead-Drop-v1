@@ -81,7 +81,7 @@ Below is a demonstration of sending a message from a phone (using Termux) to a l
 
 ### 2. **Message Received on Laptop**
 
-![mobile_msg](https://github.com/user-attachments/assets/06bbbb08-4d7e-44b6-9e84-830b04f7f991)
+![pc_pic](https://github.com/user-attachments/assets/29e909d8-0280-45e2-a3a8-f5df62aebbad)
 
 
 - The phone uses [Termux](https://termux.com/) to run the Python script and send the message.
