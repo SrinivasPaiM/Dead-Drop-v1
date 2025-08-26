@@ -10,7 +10,7 @@
 - **Ephemeral drops:** Each message or file is deleted after first fetch or expiry.
 - **Automatic fetching:** Receivers auto-fetch new drops in their room—no manual token copying needed.
 - **Strong encryption:** All payloads are encrypted using a passphrase-derived key (scrypt + Fernet).
-- **Cross-platform:** Works on Windows, Linux, macOS and even on Android devices  (Termux).
+- **Cross-platform:** Works on Windows, Linux, and macOS.
 
 ## How It Works
 
@@ -68,6 +68,23 @@ python p2p_dead_drop.py send-msg --room secret123 "Hello, team!"
 
 **Result:**  
 All receivers in the room instantly see the message. No manual steps, no token copying.
+
+## Visual Demo: Phone to Laptop
+
+Below is a demonstration of sending a message from a phone (using Termux) to a laptop, both connected to the same WiFi network.
+
+### 1. **Message Sent from Phone (Termux)**
+
+![Sending message from Termux on Android phone](![mobile_msg](https://github.com/user-attachments/assets/470380f2-d900-42d0-853c-ea84457841f0)
+)
+
+### 2. **Message Received on Laptop**
+
+![Message auto-fetched and displayed on laptop](![mobile_msg](https://github.com/user-attachments/assets/78226204-861f-4b7d-99df-5429648cfece)
+)
+
+- The phone uses [Termux](https://termux.com/) to run the Python script and send the message.
+- The laptop runs the receiver and automatically displays the incoming message.
 
 ## Advanced
 
