@@ -160,6 +160,8 @@ class UDPListener(threading.Thread):
                 continue
             except Exception:
                 continue
+            # DEBUG: Print all received UDP packets
+            print(f"[debug] UDP packet from {addr[0]}:{addr[1]}: {data[:80]!r}")
             try:
                 msg = json.loads(data.decode())
             except Exception:
@@ -315,8 +317,7 @@ def cmd_send_msg(args):
             # no direct signal; but we can test store empty
             if store.take(token) is None:
                 # either fetched or expired removed; check expiry
-                if time.time() <= drop.expires_at + 1.0:
-                    print("[offer] fetched; shutting down")
+                print("[offer] fetched by receiver; shutting down")
                 break
     finally:
         stop_event.set()
@@ -358,8 +359,7 @@ def cmd_send_file(args):
                 print("[offer] expired; shutting down")
                 break
             if store.take(token) is None:
-                if time.time() <= drop.expires_at + 1.0:
-                    print("[offer] fetched; shutting down")
+                print("[offer] fetched by receiver; shutting down")
                 break
     finally:
         stop_event.set()
@@ -430,7 +430,7 @@ def cmd_fetch(args):
 
 def main():
     ap = argparse.ArgumentParser(description="P2P Dead Drop (ephemeral, encrypted, LAN)")
-    sub = ap.add_subparsers(dest='cmd', required=True)
+    sub = ap.add_subparsers(dest='cmd')  # removed required=True
 
     ap_run = sub.add_parser('run', help='run node, listen for offers')
     ap_run.add_argument('--room', required=True, help='shared room passphrase')
@@ -460,6 +460,9 @@ def main():
     ap_fetch.set_defaults(func=cmd_fetch)
 
     args = ap.parse_args()
+    if not hasattr(args, 'func'):
+        ap.print_help()
+        sys.exit(1)
     rc = args.func(args)
     if isinstance(rc, int):
         sys.exit(rc)
@@ -467,3 +470,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+python p2p_dead_drop.py fetch --from 192.168.2.157 --token WuJuWvYe.. --room myroom
