@@ -160,8 +160,6 @@ class UDPListener(threading.Thread):
                 continue
             except Exception:
                 continue
-            # DEBUG: Print all received UDP packets
-            print(f"[debug] UDP packet from {addr[0]}:{addr[1]}: {data[:80]!r}")
             try:
                 msg = json.loads(data.decode())
             except Exception:
@@ -250,32 +248,52 @@ def cmd_run(args):
     room = room_hash(args.room)
     store = DropStore()
     stop_event = threading.Event()
-
+    
     offers = {}
     udp_listener = UDPListener(room, offers, stop_event)
     udp_listener.start()
-
+    
     tcp_srv = TCPServer(store, args.tcp_port, args.room, stop_event)
     tcp_srv.start()
-
+    
     bcast = UDPBroadcaster(room, args.tcp_port, stop_event)
     bcast.start()
-
+    
     print(f"[node] running: room={args.room} ({room}), tcp_port={args.tcp_port}, ip={get_local_ip()}")
-    print("[node] waiting for offers... (press Ctrl+C to exit)")
+    print("[node] auto-fetching messages... (press Ctrl+C to exit)")
+    
+    fetched_offers = set()
+    
     try:
         while True:
-            # Reap expired drops
             store.reap()
-            # Show known offers
             if offers:
-                print("\n[offers]")
                 for oid, off in list(offers.items()):
                     exp_in = int(off['expires_at'] - time.time())
                     if exp_in <= 0:
                         offers.pop(oid, None)
                         continue
-                    print(f"  token={off['id'][:8]}.. kind={off['kind']} name={off['name']} from={off['from']}:{off['port']} ttl={exp_in}s")
+                        
+                    # Only show offers that haven't been fetched yet
+                    if off['id'] not in fetched_offers:
+                        print(f"\n[offers]\n  token={off['id'][:8]}.. kind={off['kind']} name={off['name']} from={off['from']}:{off['port']} ttl={exp_in}s")
+                    
+                    if off['kind'] == 'msg' and off['id'] not in fetched_offers:
+                        fetched_offers.add(off['id'])
+                        try:
+                            fetch_args = argparse.Namespace(
+                                from_ip=off['from'],
+                                port=off['port'],
+                                token=off['id'],
+                                room=args.room,
+                                out=None
+                            )
+                            if cmd_fetch(fetch_args) == 0:  # Successful fetch
+                                offers.pop(oid, None)  # Remove fetched offer
+                        except (ConnectionRefusedError, socket.timeout, ConnectionError) as e:
+                            print(f"[fetch] failed to connect to {off['from']}:{off['port']} - {str(e)}")
+                            fetched_offers.remove(off['id'])  # Allow retry on connection error
+                            continue
             time.sleep(2.0)
     except KeyboardInterrupt:
         pass
@@ -317,7 +335,8 @@ def cmd_send_msg(args):
             # no direct signal; but we can test store empty
             if store.take(token) is None:
                 # either fetched or expired removed; check expiry
-                print("[offer] fetched by receiver; shutting down")
+                if time.time() <= drop.expires_at + 1.0:
+                    print("[offer] fetched; shutting down")
                 break
     finally:
         stop_event.set()
@@ -359,7 +378,8 @@ def cmd_send_file(args):
                 print("[offer] expired; shutting down")
                 break
             if store.take(token) is None:
-                print("[offer] fetched by receiver; shutting down")
+                if time.time() <= drop.expires_at + 1.0:
+                    print("[offer] fetched; shutting down")
                 break
     finally:
         stop_event.set()
