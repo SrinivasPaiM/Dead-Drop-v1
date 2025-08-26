@@ -470,4 +470,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-python p2p_dead_drop.py fetch --from 192.168.2.157 --token WuJuWvYe.. --room myroom
