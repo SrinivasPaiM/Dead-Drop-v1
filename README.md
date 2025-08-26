@@ -10,7 +10,7 @@
 - **Ephemeral drops:** Each message or file is deleted after first fetch or expiry.
 - **Automatic fetching:** Receivers auto-fetch new drops in their room—no manual token copying needed.
 - **Strong encryption:** All payloads are encrypted using a passphrase-derived key (scrypt + Fernet).
-- **Cross-platform:** Works on Windows, Linux, and macOS.
+- **Cross-platform:** Works on Windows, Linux, macOS and even on Android devices  (Termux).
 
 ## How It Works
 
